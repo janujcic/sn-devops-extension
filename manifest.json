@@ -1,0 +1,18 @@
+{
+  "manifest_version":3,
+  "version":"1.0",
+  "name":"SNDevOps",
+  "permissions": [
+    "activeTab",
+	"storage"
+  ],
+  "action": {
+	  "default_popup": "popup.html"
+  },
+  "content_scripts":[
+    {
+     "matches":["https://dev.azure.com/*"],
+     "js":["main.js"]
+    }
+  ]
+}
