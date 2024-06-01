@@ -18,7 +18,10 @@ function addServiceNowLink(baseServiceNowUrl) {
   const fileElements = document.querySelectorAll('.body-m.text-ellipsis'); // Adjust the selector as needed
   fileElements.forEach(fileElement => {
     const fileName = fileElement.textContent.trim();
-	//alert(fileName);
+	let fileNameParts = fileName.split(".");
+	if (fileNameParts[fileNameParts.length - 1] != "xml") {
+		return;
+	}
     const [serviceNowLink, docSysId] = generateServiceNowLink(fileName, baseServiceNowUrl);
 
     // Check if the link already exists to prevent duplicate links
