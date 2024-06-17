@@ -113,67 +113,7 @@ function addServiceNowLink(baseServiceNowUrl) {
 		
 	}
 }
- 
-  /*
-  const fileElements = document.querySelectorAll('.body-m.text-ellipsis'); // Adjust the selector as needed
-  
-  fileElements.forEach(fileElement => {
-	// get the XML data
-	const fileElements = document.querySelectorAll('.body-m.text-ellipsis');
-	
-	
-    const fileName = fileElement.textContent.trim();
-	let fileNameParts = fileName.split(".");
-	if (fileNameParts[fileNameParts.length - 1] != "xml") {
-		return;
-	}
-	
-	
-	
-    const [serviceNowLink, docSysId] = generateServiceNowLink(fileName, baseServiceNowUrl);
-	
 
-    // Check if the link already exists to prevent duplicate links
-    if (!fileElement.querySelector(`.service-now-link_${docSysId}`)) {
-
-		// Create the link element
-		const linkElement = document.createElement('a');
-		linkElement.href = serviceNowLink;
-		linkElement.textContent = "View in ServiceNow";
-		linkElement.target = "_blank";
-		linkElement.className = `service-now-link_${docSysId}`;
-		linkElement.style.marginLeft = "10px"; // Adjust styling as needed
-
-		// Append the link to the file element
-		fileElement.appendChild(linkElement);
-    }
-	if (!fileElement.querySelector(`.document_summary_button_${docSysId}`)) {
-		
-		
-	  	
-		// Create the "Summary" button 
-		const summaryButton = document.createElement('button');
-		summaryButton.textContent = "Summary";
-		summaryButton.className = `document_summary_button_${docSysId}`;
-		summaryButton.style.marginLeft = "10px";
-		summaryButton.style.borderRadius = "12px";
-		summaryButton.style.padding = "5px 10px";
-		summaryButton.style.cursor = "pointer";
-		summaryButton.style.backgroundColor = "#333"; // Dark background
-		summaryButton.style.color = "#fff"; // White text
-		summaryButton.style.border = "1px solid #555"; // Slightly lighter border
-		summaryButton.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)"; // Subtle shadow
-
-		summaryButton.addEventListener('click', (event) => {
-		openSummaryPopup(event, fileName, xmlSummary);
-		});
-
-		// Append the link to the file element
-		fileElement.appendChild(summaryButton);
-	}
-	
-  }); 
-  */
 
 
 function extractXML(htmlElement) {
