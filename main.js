@@ -37,10 +37,6 @@ function addServiceNowLink(baseServiceNowUrl) {
 				}
 			}
 			
-			if (cardContent) {
-				xmlSummary = extractXML(cardContent);
-			}
-			
 			
 			if (typeof fileTitle === 'undefined' || typeof docSysId === 'undefined') {
 				return;
@@ -60,27 +56,7 @@ function addServiceNowLink(baseServiceNowUrl) {
 				// Append the link to the file element
 				fileTitle.appendChild(linkElement);
 			}
-			if (!childElement.querySelector(`.document_summary_button_${docSysId}`) && xmlSummary != "" && false) {
-				// Create the "Summary" button 
-				const summaryButton = document.createElement('button');
-				summaryButton.textContent = "Summary";
-				summaryButton.className = `document_summary_button_${docSysId}`;
-				summaryButton.style.marginLeft = "10px";
-				summaryButton.style.borderRadius = "12px";
-				summaryButton.style.padding = "5px 10px";
-				summaryButton.style.cursor = "pointer";
-				summaryButton.style.backgroundColor = "#333"; // Dark background
-				summaryButton.style.color = "#fff"; // White text
-				summaryButton.style.border = "1px solid #555"; // Slightly lighter border
-				summaryButton.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)"; // Subtle shadow
-
-				summaryButton.addEventListener('click', (event) => {
-				openSummaryPopup(event, fileName, xmlSummary);
-				});
-
-				// Append the link to the file element
-				fileTitle.appendChild(summaryButton);
-			}
+			
 			
 		});
 	}
@@ -109,6 +85,31 @@ function addServiceNowLink(baseServiceNowUrl) {
 					// Append the link to the file element
 					fileElement.appendChild(linkElement);
 			}
+			
+			const xmlSummary = "";
+			
+			if (!document.querySelector(`.document_summary_button_${docSysId}`) && xmlSummary != "" && false) {
+				// Create the "Summary" button 
+				const summaryButton = document.createElement('button');
+				summaryButton.textContent = "Summary";
+				summaryButton.className = `document_summary_button_${docSysId}`;
+				summaryButton.style.marginLeft = "10px";
+				summaryButton.style.borderRadius = "12px";
+				summaryButton.style.padding = "5px 10px";
+				summaryButton.style.cursor = "pointer";
+				summaryButton.style.backgroundColor = "#333"; // Dark background
+				summaryButton.style.color = "#fff"; // White text
+				summaryButton.style.border = "1px solid #555"; // Slightly lighter border
+				summaryButton.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)"; // Subtle shadow
+
+				summaryButton.addEventListener('click', (event) => {
+				openSummaryPopup(event, fileName, xmlSummary);
+				});
+
+				// Append the link to the file element
+				fileElement.appendChild(summaryButton);
+			}
+			
 		});
 		
 	}
