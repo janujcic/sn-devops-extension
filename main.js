@@ -16,7 +16,14 @@ function generateServiceNowLink(fileName, serviceNowUrl) {
 }
 
 // Function to inject the ServiceNow link into the Azure DevOps page
-function addServiceNowLink(serviceNowUrl) {
+function addServiceNowLink(serviceNowUrls) {
+  const serviceNowDevUrl =
+    serviceNowUrls.serviceNowDevUrl || "https://default.service-now.com/";
+  const serviceNowTestUrl =
+    serviceNowUrls.serviceNowTestUrl || "https://default.service-now.com/";
+  const serviceNowProdUrl =
+    serviceNowUrls.serviceNowProdUrl || "https://default.service-now.com/";
+
   // Check for the specific element where you want to add the link (e.g., file list, commit details)
   const classElement =
     ".flex-grow.absolute-fill.repos-changes-viewer.flex-column.rhythm-vertical-16.scroll-auto.scroll-auto-hide.custom-scrollbar.is-folder";
@@ -40,9 +47,17 @@ function addServiceNowLink(serviceNowUrl) {
           fileName = fileTitle.textContent.trim();
           let fileNameParts = fileName.split(".");
           if (fileNameParts[fileNameParts.length - 1] == "xml") {
-            [serviceNowLink, docSysId] = generateServiceNowLink(
+            [serviceNowDevLink, docSysId] = generateServiceNowLink(
               fileName,
-              serviceNowUrl
+              serviceNowDevUrl
+            );
+            [serviceNowTestLink, docSysId] = generateServiceNowLink(
+              fileName,
+              serviceNowTestUrl
+            );
+            [serviceNowProdLink, docSysId] = generateServiceNowLink(
+              fileName,
+              serviceNowProdUrl
             );
           }
         }
@@ -55,7 +70,39 @@ function addServiceNowLink(serviceNowUrl) {
         }
 
         // Check if the link already exists to prevent duplicate links
-        if (!childElement.querySelector(`.service-now-link_${docSysId}`)) {
+        if (!childElement.querySelector(`.service-now-dropdown_${docSysId}`)) {
+          const dropdown = document.createElement("select");
+          dropdown.className = `service-now-dropdown_${docSysId}`;
+          dropdown.style.marginLeft = "10px"; // Adjust styling as needed
+
+          const defaultOption = document.createElement("option");
+          defaultOption.textContent = "Record in environments";
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          dropdown.appendChild(defaultOption);
+
+          const links = [
+            { name: "View in ServiceNow DEV", href: serviceNowDevLink },
+            { name: "View in ServiceNow TEST", href: serviceNowTestLink },
+            { name: "View in ServiceNow PROD", href: serviceNowProdLink },
+          ];
+
+          links.forEach((link) => {
+            const option = document.createElement("option");
+            option.textContent = link.name;
+            option.value = link.href;
+            dropdown.appendChild(option);
+          });
+
+          dropdown.addEventListener("change", (event) => {
+            if (event.target.value) {
+              window.open(event.target.value, "_blank");
+              dropdown.selectedIndex = 0;
+            }
+          });
+
+          fileTitle.appendChild(dropdown);
+          /*
           // Create the link element
           const linkElement = document.createElement("a");
           linkElement.href = serviceNowLink;
@@ -66,6 +113,7 @@ function addServiceNowLink(serviceNowUrl) {
 
           // Append the link to the file element
           fileTitle.appendChild(linkElement);
+		  */
         }
       });
     }
@@ -78,13 +126,53 @@ function addServiceNowLink(serviceNowUrl) {
       if (fileNameParts[fileNameParts.length - 1] != "xml") {
         return;
       }
-      const [serviceNowLink, docSysId] = generateServiceNowLink(
+      [serviceNowDevLink, docSysId] = generateServiceNowLink(
         fileName,
-        serviceNowUrl
+        serviceNowDevUrl
+      );
+      [serviceNowTestLink, docSysId] = generateServiceNowLink(
+        fileName,
+        serviceNowTestUrl
+      );
+      [serviceNowProdLink, docSysId] = generateServiceNowLink(
+        fileName,
+        serviceNowProdUrl
       );
 
-      if (!document.querySelector(`.service-now-link_${docSysId}`)) {
-        // Create the link element
+      if (!document.querySelector(`.service-now-dropdown_${docSysId}`)) {
+        const dropdown = document.createElement("select");
+        dropdown.className = `service-now-dropdown_${docSysId}`;
+        dropdown.style.marginLeft = "10px"; // Adjust styling as needed
+
+        const defaultOption = document.createElement("option");
+        defaultOption.textContent = "Record in environments";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        dropdown.appendChild(defaultOption);
+
+        const links = [
+          { name: "View in ServiceNow DEV", href: serviceNowDevLink },
+          { name: "View in ServiceNow TEST", href: serviceNowTestLink },
+          { name: "View in ServiceNow PROD", href: serviceNowProdLink },
+        ];
+
+        links.forEach((link) => {
+          const option = document.createElement("option");
+          option.textContent = link.name;
+          option.value = link.href;
+          dropdown.appendChild(option);
+        });
+
+        dropdown.addEventListener("change", (event) => {
+          if (event.target.value) {
+            window.open(event.target.value, "_blank");
+            dropdown.selectedIndex = 0;
+          }
+        });
+
+        fileElement.appendChild(dropdown);
+
+        /*
         const linkElement = document.createElement("a");
         linkElement.href = serviceNowLink;
         linkElement.textContent = "View in ServiceNow";
@@ -94,6 +182,7 @@ function addServiceNowLink(serviceNowUrl) {
 
         // Append the link to the file element
         fileElement.appendChild(linkElement);
+		*/
       }
 
       const xmlSummary = "";
@@ -210,19 +299,13 @@ function debounce(func, wait) {
 // Retrieve the serviceNowUrl from storage and initialize
 chrome.storage.sync.get(["serviceNowUrls"], (result) => {
   const serviceNowUrls = result.serviceNowUrls;
-  const serviceNowDevUrl =
-    serviceNowUrls.serviceNowDevUrl || "https://default.service-now.com/";
-  const serviceNowTestUrl =
-    serviceNowUrls.serviceNowTestUrl || "https://default.service-now.com/";
-  const serviceNowProdUrl =
-    serviceNowUrls.serviceNowProdUrl || "https://default.service-now.com/";
 
   // Attach the global click event listener
   document.addEventListener(
     "click",
-    debounce(() => addServiceNowLink(serviceNowDevUrl), 300)
+    debounce(() => addServiceNowLink(serviceNowUrls), 300)
   );
 
   // Initial run to catch any elements already on the page
-  window.addEventListener("load", () => addServiceNowLink(serviceNowDevUrl));
+  window.addEventListener("load", () => addServiceNowLink(serviceNowUrls));
 });
