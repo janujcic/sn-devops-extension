@@ -15,6 +15,27 @@ function generateServiceNowLink(fileName, serviceNowUrl) {
   ];
 }
 
+function openTwoWindows(firstLink, secondLink) {
+  const screenWidth = window.screen.availWidth; // Use available screen width
+  const screenHeight = window.screen.availHeight; // Use available screen height
+
+  // Open the first window on the left
+  window.open(
+    firstLink,
+    "_blank",
+    `width=${screenWidth / 2},height=${screenHeight},left=0,top=0`
+  );
+
+  // Open the second window on the right
+  window.open(
+    secondLink,
+    "_blank",
+    `width=${screenWidth / 2},height=${screenHeight},left=${
+      screenWidth / 2
+    },top=0`
+  );
+}
+
 // Function to inject the ServiceNow link into the Azure DevOps page
 function addServiceNowLink(serviceNowUrls) {
   const serviceNowDevUrl =
@@ -102,18 +123,6 @@ function addServiceNowLink(serviceNowUrls) {
           });
 
           fileTitle.appendChild(dropdown);
-          /*
-          // Create the link element
-          const linkElement = document.createElement("a");
-          linkElement.href = serviceNowLink;
-          linkElement.textContent = "View in ServiceNow";
-          linkElement.target = "_blank";
-          linkElement.className = `service-now-link_${docSysId}`;
-          linkElement.style.marginLeft = "10px"; // Adjust styling as needed
-
-          // Append the link to the file element
-          fileTitle.appendChild(linkElement);
-		  */
         }
       });
     }
@@ -154,35 +163,47 @@ function addServiceNowLink(serviceNowUrls) {
           { name: "View in ServiceNow DEV", href: serviceNowDevLink },
           { name: "View in ServiceNow TEST", href: serviceNowTestLink },
           { name: "View in ServiceNow PROD", href: serviceNowProdLink },
+          {
+            name: "Open DEV/TEST",
+            action: () => openTwoWindows(serviceNowDevLink, serviceNowTestLink),
+          },
+          {
+            name: "Open TEST/PROD",
+            action: () =>
+              openTwoWindows(serviceNowTestLink, serviceNowProdLink),
+          },
         ];
 
         links.forEach((link) => {
           const option = document.createElement("option");
           option.textContent = link.name;
-          option.value = link.href;
+          if (link.href) {
+            option.value = link.href;
+          } else if (link.action) {
+            option.setAttribute("data-action", "true");
+          }
           dropdown.appendChild(option);
         });
 
         dropdown.addEventListener("change", (event) => {
-          if (event.target.value) {
+          const selectedOption =
+            event.target.options[event.target.selectedIndex];
+          const action = selectedOption.getAttribute("data-action");
+
+          if (action) {
+            const selectedLink = links.find(
+              (link) => link.name === selectedOption.text
+            );
+            selectedLink?.action();
+          } else if (event.target.value) {
+            // Open the selected link in a new tab
             window.open(event.target.value, "_blank");
-            dropdown.selectedIndex = 0;
           }
+
+          dropdown.selectedIndex = 0;
         });
 
         fileElement.appendChild(dropdown);
-
-        /*
-        const linkElement = document.createElement("a");
-        linkElement.href = serviceNowLink;
-        linkElement.textContent = "View in ServiceNow";
-        linkElement.target = "_blank";
-        linkElement.className = `service-now-link_${docSysId}`;
-        linkElement.style.marginLeft = "10px"; // Adjust styling as needed
-
-        // Append the link to the file element
-        fileElement.appendChild(linkElement);
-		*/
       }
 
       const xmlSummary = "";
