@@ -1,30 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Set SNDevOps Variables</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 10px;
-	  width: 400px;  /* Adjust the width as needed */
-      height: 150px; /* Adjust the height as needed */
-    }
-    input[type="text"] {
-      width: 100%;
-	  width: 300px;
-      padding: 5px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 5px 10px;
-    }
-  </style>
-</head>
-<body>
-  <h3>Set ServiceNow URL</h3>
-  <input type="text" id="serviceNowUrl" placeholder="https://yourinstance.service-now.com/">
-  <button id="saveButton">Save</button>
+  <head>
+    <title>Set SNDevOps Variables</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 10px;
+        width: 400px; /* Adjust the width as needed */
+        height: 250px; /* Adjust the height as needed */
+      }
+      input[type="text"] {
+        width: 100%;
+        width: 300px;
+        padding: 5px;
+      }
+      button {
+        margin-top: 10px;
+        padding: 5px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Set ServiceNow URL</h3>
+    <p>DEV</p>
+    <input
+      type="text"
+      id="serviceNowDevUrl"
+      placeholder="https://yourinstance.service-now.com/"
+    />
+    <p>TEST</p>
+    <input
+      type="text"
+      id="serviceNowTestUrl"
+      placeholder="https://yourinstance.service-now.com/"
+    />
+    <p>PROD</p>
+    <input
+      type="text"
+      id="serviceNowProdUrl"
+      placeholder="https://yourinstance.service-now.com/"
+    />
+    <button id="saveButton">Save</button>
 
-  <script src="popup.js"></script>
-</body>
+    <script src="popup.js"></script>
+  </body>
 </html>
