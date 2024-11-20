@@ -2,23 +2,7 @@
 <html>
   <head>
     <title>Set SNDevOps Variables</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 10px;
-        width: 400px; /* Adjust the width as needed */
-        height: 250px; /* Adjust the height as needed */
-      }
-      input[type="text"] {
-        width: 100%;
-        width: 300px;
-        padding: 5px;
-      }
-      button {
-        margin-top: 10px;
-        padding: 5px 10px;
-      }
-    </style>
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <h3>Set ServiceNow URL</h3>
@@ -41,6 +25,7 @@
       placeholder="https://yourinstance.service-now.com/"
     />
     <button id="saveButton">Save</button>
+    <div id="saving-success"></div>
 
     <script src="popup.js"></script>
   </body>

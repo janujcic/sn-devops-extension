@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("ServiceNow TEST URL saved:", serviceNowTestUrl);
         console.log("ServiceNow PROD URL saved:", serviceNowProdUrl);
       });
+      const successDisplay = document.getElementById("saving-success");
+      successDisplay.innerText = "URL successfully saved!";
     }
   });
 });

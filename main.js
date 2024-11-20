@@ -6,7 +6,6 @@ function generateServiceNowLink(fileName, serviceNowUrl) {
   const sysIdWithExtension = parts[parts.length - 1];
   const sysId = sysIdWithExtension.split(".")[0];
 
-  // Adjust this part to create the correct URL based on your ServiceNow instance
   return [
     `${serviceNowUrl}nav_to.do?uri=${tableName}.do?sys_id=${encodeURIComponent(
       sysId
