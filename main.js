@@ -6,13 +6,121 @@ function generateServiceNowLink(fileName, serviceNowUrl) {
   const sysIdWithExtension = parts[parts.length - 1];
   const sysId = sysIdWithExtension.split(".")[0];
 
-  // Adjust this part to create the correct URL based on your ServiceNow instance
   return [
     `${serviceNowUrl}nav_to.do?uri=${tableName}.do?sys_id=${encodeURIComponent(
       sysId
     )}`,
     sysId,
   ];
+}
+
+function openTwoWindows(firstLink, secondLink) {
+  const screenWidth = window.screen.availWidth; // Use available screen width
+  const screenHeight = window.screen.availHeight; // Use available screen height
+
+  const screenLeft = window.screenLeft || window.screenX;
+  const screenTop = window.screenTop || window.screenY;
+
+  // Open the first window on the left
+  window.open(
+    firstLink,
+    "_blank",
+    `width=${
+      screenWidth / 2
+    },height=${screenHeight},left=${screenLeft},top=${screenTop}`
+  );
+
+  // Open the second window on the right
+  window.open(
+    secondLink,
+    "_blank",
+    `width=${screenWidth / 2},height=${screenHeight},left=${
+      screenLeft + screenWidth / 2
+    },top=${screenTop}`
+  );
+}
+
+function createDropdown(docSysId, serviceNowLinks) {
+  const dropdown = document.createElement("select");
+  dropdown.className = `service-now-dropdown_${docSysId}`;
+  dropdown.style.marginLeft = "10px"; // Adjust styling as needed
+  dropdown.style.backgroundColor = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches
+    ? "#333333"
+    : "#ffffff";
+  dropdown.style.color = window.matchMedia("(prefers-color-scheme: dark)")
+    .matches
+    ? "#ffffff"
+    : "#000000";
+  dropdown.style.border = `1px solid ${
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "#555555"
+      : "#ccc"
+  }`;
+
+  const defaultOption = document.createElement("option");
+  defaultOption.textContent = "Record in environments";
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  dropdown.appendChild(defaultOption);
+
+  const links = [
+    { name: "View in ServiceNow DEV", href: serviceNowLinks.serviceNowDevLink },
+    {
+      name: "View in ServiceNow TEST",
+      href: serviceNowLinks.serviceNowTestLink,
+    },
+    {
+      name: "View in ServiceNow PROD",
+      href: serviceNowLinks.serviceNowProdLink,
+    },
+    {
+      name: "Open DEV/TEST",
+      action: () =>
+        openTwoWindows(
+          serviceNowLinks.serviceNowDevLink,
+          serviceNowLinks.serviceNowTestLink
+        ),
+    },
+    {
+      name: "Open TEST/PROD",
+      action: () =>
+        openTwoWindows(
+          serviceNowLinks.serviceNowTestLink,
+          serviceNowLinks.serviceNowProdLink
+        ),
+    },
+  ];
+
+  links.forEach((link) => {
+    const option = document.createElement("option");
+    option.textContent = link.name;
+    if (link.href) {
+      option.value = link.href;
+    } else if (link.action) {
+      option.setAttribute("data-action", "true");
+    }
+    dropdown.appendChild(option);
+  });
+
+  dropdown.addEventListener("change", (event) => {
+    const selectedOption = event.target.options[event.target.selectedIndex];
+    const action = selectedOption.getAttribute("data-action");
+
+    if (action) {
+      const selectedLink = links.find(
+        (link) => link.name === selectedOption.text
+      );
+      selectedLink?.action();
+    } else if (event.target.value) {
+      // Open the selected link in a new tab
+      window.open(event.target.value, "_blank");
+    }
+
+    dropdown.selectedIndex = 0;
+  });
+  return dropdown;
 }
 
 // Function to inject the ServiceNow link into the Azure DevOps page
@@ -24,10 +132,11 @@ function addServiceNowLink(serviceNowUrls) {
   const serviceNowProdUrl =
     serviceNowUrls.serviceNowProdUrl || "https://default.service-now.com/";
 
-  // Check for the specific element where you want to add the link (e.g., file list, commit details)
+  var serviceNowLinks;
+
   const classElement =
     ".flex-grow.absolute-fill.repos-changes-viewer.flex-column.rhythm-vertical-16.scroll-auto.scroll-auto-hide.custom-scrollbar.is-folder";
-  const folderElement = document.querySelector(classElement); // Adjust the selector as needed
+  const folderElement = document.querySelector(classElement);
   if (folderElement) {
     const commitElement =
       ".repos-summary-header.flex-noshrink.bolt-card.flex-column.depth-8.bolt-card-white";
@@ -59,6 +168,11 @@ function addServiceNowLink(serviceNowUrls) {
               fileName,
               serviceNowProdUrl
             );
+            serviceNowLinks = {
+              serviceNowDevLink,
+              serviceNowTestLink,
+              serviceNowProdLink,
+            };
           }
         }
 
@@ -71,49 +185,8 @@ function addServiceNowLink(serviceNowUrls) {
 
         // Check if the link already exists to prevent duplicate links
         if (!childElement.querySelector(`.service-now-dropdown_${docSysId}`)) {
-          const dropdown = document.createElement("select");
-          dropdown.className = `service-now-dropdown_${docSysId}`;
-          dropdown.style.marginLeft = "10px"; // Adjust styling as needed
-
-          const defaultOption = document.createElement("option");
-          defaultOption.textContent = "Record in environments";
-          defaultOption.disabled = true;
-          defaultOption.selected = true;
-          dropdown.appendChild(defaultOption);
-
-          const links = [
-            { name: "View in ServiceNow DEV", href: serviceNowDevLink },
-            { name: "View in ServiceNow TEST", href: serviceNowTestLink },
-            { name: "View in ServiceNow PROD", href: serviceNowProdLink },
-          ];
-
-          links.forEach((link) => {
-            const option = document.createElement("option");
-            option.textContent = link.name;
-            option.value = link.href;
-            dropdown.appendChild(option);
-          });
-
-          dropdown.addEventListener("change", (event) => {
-            if (event.target.value) {
-              window.open(event.target.value, "_blank");
-              dropdown.selectedIndex = 0;
-            }
-          });
-
+          const dropdown = createDropdown(docSysId, serviceNowLinks);
           fileTitle.appendChild(dropdown);
-          /*
-          // Create the link element
-          const linkElement = document.createElement("a");
-          linkElement.href = serviceNowLink;
-          linkElement.textContent = "View in ServiceNow";
-          linkElement.target = "_blank";
-          linkElement.className = `service-now-link_${docSysId}`;
-          linkElement.style.marginLeft = "10px"; // Adjust styling as needed
-
-          // Append the link to the file element
-          fileTitle.appendChild(linkElement);
-		  */
         }
       });
     }
@@ -138,51 +211,15 @@ function addServiceNowLink(serviceNowUrls) {
         fileName,
         serviceNowProdUrl
       );
+      serviceNowLinks = {
+        serviceNowDevLink,
+        serviceNowTestLink,
+        serviceNowProdLink,
+      };
 
       if (!document.querySelector(`.service-now-dropdown_${docSysId}`)) {
-        const dropdown = document.createElement("select");
-        dropdown.className = `service-now-dropdown_${docSysId}`;
-        dropdown.style.marginLeft = "10px"; // Adjust styling as needed
-
-        const defaultOption = document.createElement("option");
-        defaultOption.textContent = "Record in environments";
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        dropdown.appendChild(defaultOption);
-
-        const links = [
-          { name: "View in ServiceNow DEV", href: serviceNowDevLink },
-          { name: "View in ServiceNow TEST", href: serviceNowTestLink },
-          { name: "View in ServiceNow PROD", href: serviceNowProdLink },
-        ];
-
-        links.forEach((link) => {
-          const option = document.createElement("option");
-          option.textContent = link.name;
-          option.value = link.href;
-          dropdown.appendChild(option);
-        });
-
-        dropdown.addEventListener("change", (event) => {
-          if (event.target.value) {
-            window.open(event.target.value, "_blank");
-            dropdown.selectedIndex = 0;
-          }
-        });
-
+        const dropdown = createDropdown(docSysId, serviceNowLinks);
         fileElement.appendChild(dropdown);
-
-        /*
-        const linkElement = document.createElement("a");
-        linkElement.href = serviceNowLink;
-        linkElement.textContent = "View in ServiceNow";
-        linkElement.target = "_blank";
-        linkElement.className = `service-now-link_${docSysId}`;
-        linkElement.style.marginLeft = "10px"; // Adjust styling as needed
-
-        // Append the link to the file element
-        fileElement.appendChild(linkElement);
-		*/
       }
 
       const xmlSummary = "";
