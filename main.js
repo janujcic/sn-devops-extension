@@ -18,11 +18,16 @@ function openTwoWindows(firstLink, secondLink) {
   const screenWidth = window.screen.availWidth; // Use available screen width
   const screenHeight = window.screen.availHeight; // Use available screen height
 
+  const screenLeft = window.screenLeft || window.screenX;
+  const screenTop = window.screenTop || window.screenY;
+
   // Open the first window on the left
   window.open(
     firstLink,
     "_blank",
-    `width=${screenWidth / 2},height=${screenHeight},left=0,top=0`
+    `width=${
+      screenWidth / 2
+    },height=${screenHeight},left=${screenLeft},top=${screenTop}`
   );
 
   // Open the second window on the right
@@ -30,8 +35,8 @@ function openTwoWindows(firstLink, secondLink) {
     secondLink,
     "_blank",
     `width=${screenWidth / 2},height=${screenHeight},left=${
-      screenWidth / 2
-    },top=0`
+      screenLeft + screenWidth / 2
+    },top=${screenTop}`
   );
 }
 
@@ -44,10 +49,9 @@ function addServiceNowLink(serviceNowUrls) {
   const serviceNowProdUrl =
     serviceNowUrls.serviceNowProdUrl || "https://default.service-now.com/";
 
-  // Check for the specific element where you want to add the link (e.g., file list, commit details)
   const classElement =
     ".flex-grow.absolute-fill.repos-changes-viewer.flex-column.rhythm-vertical-16.scroll-auto.scroll-auto-hide.custom-scrollbar.is-folder";
-  const folderElement = document.querySelector(classElement); // Adjust the selector as needed
+  const folderElement = document.querySelector(classElement);
   if (folderElement) {
     const commitElement =
       ".repos-summary-header.flex-noshrink.bolt-card.flex-column.depth-8.bolt-card-white";
@@ -105,20 +109,45 @@ function addServiceNowLink(serviceNowUrls) {
             { name: "View in ServiceNow DEV", href: serviceNowDevLink },
             { name: "View in ServiceNow TEST", href: serviceNowTestLink },
             { name: "View in ServiceNow PROD", href: serviceNowProdLink },
+            {
+              name: "Open DEV/TEST",
+              action: () =>
+                openTwoWindows(serviceNowDevLink, serviceNowTestLink),
+            },
+            {
+              name: "Open TEST/PROD",
+              action: () =>
+                openTwoWindows(serviceNowTestLink, serviceNowProdLink),
+            },
           ];
 
           links.forEach((link) => {
             const option = document.createElement("option");
             option.textContent = link.name;
-            option.value = link.href;
+            if (link.href) {
+              option.value = link.href;
+            } else if (link.action) {
+              option.setAttribute("data-action", "true");
+            }
             dropdown.appendChild(option);
           });
 
           dropdown.addEventListener("change", (event) => {
-            if (event.target.value) {
+            const selectedOption =
+              event.target.options[event.target.selectedIndex];
+            const action = selectedOption.getAttribute("data-action");
+
+            if (action) {
+              const selectedLink = links.find(
+                (link) => link.name === selectedOption.text
+              );
+              selectedLink?.action();
+            } else if (event.target.value) {
+              // Open the selected link in a new tab
               window.open(event.target.value, "_blank");
-              dropdown.selectedIndex = 0;
             }
+
+            dropdown.selectedIndex = 0;
           });
 
           fileTitle.appendChild(dropdown);
