@@ -211,6 +211,11 @@ function addServiceNowLink(serviceNowUrls) {
         fileName,
         serviceNowProdUrl
       );
+      serviceNowLinks = {
+        serviceNowDevLink,
+        serviceNowTestLink,
+        serviceNowProdLink,
+      };
 
       if (!document.querySelector(`.service-now-dropdown_${docSysId}`)) {
         const dropdown = createDropdown(docSysId, serviceNowLinks);
