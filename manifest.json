@@ -1,19 +1,17 @@
 {
-  "manifest_version":3,
-  "version":"1.1",
-  "name":"SNDevOps",
+  "manifest_version": 3,
+  "version": "1.1",
+  "name": "SNDevOps",
   "description": "Helper for reviewing ServiceNow commits in Azure DevOps (personal work, not affiliated to ServiceNow or Azure).",
-  "permissions": [
-    "activeTab",
-	"storage"
-  ],
+  "permissions": ["activeTab", "storage"],
   "action": {
-	  "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "sn_devops48.png"
   },
-  "content_scripts":[
+  "content_scripts": [
     {
-     "matches":["https://dev.azure.com/*"],
-     "js":["main.js"]
+      "matches": ["https://dev.azure.com/*"],
+      "js": ["main.js"]
     }
   ]
 }
