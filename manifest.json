@@ -6,7 +6,16 @@
   "permissions": ["activeTab", "storage"],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "sn_devops48.png"
+    "default_icon": {
+      "16": "icons/sn_devops16.png",
+      "48": "icons/sn_devops48.png",
+      "128": "icons/sn_devops128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/sn_devops16.png",
+    "48": "icons/sn_devops48.png",
+    "128": "icons/sn_devops128.png"
   },
   "content_scripts": [
     {
