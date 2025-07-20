@@ -22,5 +22,11 @@
       "matches": ["https://dev.azure.com/*"],
       "js": ["main.js"]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "SNDevOps@example.org",
+      "strict_min_version": "109.0"
+    }
+  }
 }
